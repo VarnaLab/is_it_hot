@@ -8,7 +8,7 @@ var date_string = function date_string(){ return Date.today().toYMD("_") +"@" + 
 
 var handleSave = function(err, r) {
   return function (err, r) {
-    console.log("DEBUG :: Saved to DB");
+    console.log("DEBUG :: Saved");
     if (err)  throw new Error(err);
 }
 
