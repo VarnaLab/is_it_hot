@@ -36,7 +36,7 @@ sp.on("data", function (data) {
     console.log("DEBUG :: Saving to CouchDB ... ");
       db.save(date_string()+ "@" + i, {
           time: new Date(),
-          address: addresss, 
+          address: address, 
           name: (''),
           data: temp
       }, handleSave());
