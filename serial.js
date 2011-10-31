@@ -19,13 +19,15 @@ var sp = new SerialPort("/dev/tty"+process.argv.splice(2), {
   parser: serialport.parsers.readline("\n"),
   baudrate: 9600
 });
-  
+
+var i = 0;  
 sp.on("data", function (data) {
   console.log("::"+data);
   //console.log(data.split("DATA"));
   var splitted1 = data.split("A:")
 
   if(splitted1[1]!=undefined){
+    i++;
     var splitted2 = splitted1[1].split(",T: ");
     var temp = splitted2[1].split("\r");            
     var address = splitted2[0];
