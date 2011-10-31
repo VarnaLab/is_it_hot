@@ -1,0 +1,10 @@
+{
+    "name": "is_it_hot"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+    , "cradle": "latest"
+    , "date-utils": "latest"
+    , "serialport": "latest"
+  }
+}
