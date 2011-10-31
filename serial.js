@@ -10,6 +10,7 @@ var handleSave = function(err, r) {
   return function (err, r) {
     console.log("DEBUG :: Saved to DB");
     if (err)  throw new Error(err);
+  }
 }
 
 var SerialPort = serialport.SerialPort;
