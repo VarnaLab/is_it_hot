@@ -30,7 +30,6 @@ sp.on("data", function (data) {
   var splitted1 = data.split("A:")
 
   if(splitted1[1]!=undefined){
-    i++;
     var splitted2 = splitted1[1].split(",T: "); 
     var splitted3 = splitted2[1].split("\r"); 
     var temp =  splitted3[0];          
