@@ -50,7 +50,7 @@ sp.on("data", function (data) {
   }
 
   var enddata = data.search("ENDDATA");
-  if (enddata == 1) {
+  if (enddata != -1) {
     if (argv.debug == 1) { console.log("DEBUG :: ENDDATA reached , incrementing ..."); } 
     i++;
   }
