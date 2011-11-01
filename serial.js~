@@ -1,10 +1,12 @@
+#!/usr/bin/env node
 //var assert = require('assert');
 var cradle = require('cradle');
 var date = require('date-utils');  
 var serialport = require("serialport");
+var argv = require('optimist').argv;
 
 var SerialPort = serialport.SerialPort;
-var sp = new SerialPort("/dev/tty"+process.argv.splice(2), { 
+var sp = new SerialPort("/dev/tty"+process.argv.sp, { 
   //parser: serialport.parsers.raw,
   parser: serialport.parsers.readline("\n"),
   baudrate: 9600
@@ -19,9 +21,6 @@ var i = 0;
 var date_string = function date_string(){ return Date.today().toYMD("_") +"@" + (new Date()).getHours() + ":"+(new Date()).getMinutes()+ ":" + (new Date()).getSeconds()+"." + (new Date()).getMilliseconds() };
 
 sp.on("data", function (data) {
-  console.log("  "+data);
-  
-
 
   var handleSave = function(err, r) {
     return function (err, r) {
@@ -30,6 +29,7 @@ sp.on("data", function (data) {
     }
   }
 
+  console.log("  "+data);
   var splitted1 = data.split("A:")
 
   if(splitted1[1]!=undefined){

@@ -1,17 +1,16 @@
+#!/usr/bin/env node
 //var assert = require('assert');
 var cradle = require('cradle');
 var date = require('date-utils');  
 var serialport = require("serialport");
+var argv = require('optimist').argv;
 
 var SerialPort = serialport.SerialPort;
-var sp = new SerialPort("/dev/tty"+process.argv.splice(2), { 
+var sp = new SerialPort("/dev/tty"+argv.sp, { 
   //parser: serialport.parsers.raw,
   parser: serialport.parsers.readline("\n"),
   baudrate: 9600
 });
-
-var debug = 0;
-if (process.argv.splice(3) == 'DEBUG') {var debug = 1;} 
 
 var db = new(cradle.Connection)().database('sensors_dirty');
 
@@ -22,7 +21,7 @@ sp.on("data", function (data) {
 
   var handleSave = function(err, r) {
     return function (err, r) {
-        if (debug == 1) { console.log("DEBUG :: Saved to DB"); }
+        if (argv.debug == 1) { console.log("DEBUG :: Saved to DB"); }
       if (err)  throw new Error(err);
     }
   }
@@ -37,7 +36,7 @@ sp.on("data", function (data) {
     var temp =  splitted3[0];          
     var address = splitted2[0];
     
-    if (debug == 1) {                   
+    if (argv.debug == 1) {                   
       console.log("DEBUG :: Extracted :: Address: "+address+", Temperature: "+temp);
       console.log("DEBUG :: Saving to CouchDB ... ");
     }
@@ -52,7 +51,7 @@ sp.on("data", function (data) {
 
   var enddata = data.search("ENDDATA");
   if (enddata == 1) {
-    if (debug == 1) { console.log("DEBUG :: ENDDATA reached , incrementing ..."); } 
+    if (argv.debug == 1) { console.log("DEBUG :: ENDDATA reached , incrementing ..."); } 
     i++;
   }
 });
