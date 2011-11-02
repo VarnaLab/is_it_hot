@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-//var assert = require('assert');
 var cradle = require('cradle');
 var date = require('date-utils');  
 var serialport = require("serialport");
@@ -34,6 +33,30 @@ sp.on("data", function (data) {
     var splitted3 = splitted2[1].split("\r"); 
     var temp =  splitted3[0];          
     var address = splitted2[0];
+    var name = "";
+
+    switch(address){
+      case "286C5A1E03000041":
+        name = "air_in"
+      break;
+      case "28257E1E03000045":
+        name = "room1"
+      break;
+      case "28B5501E030000AE":
+        name = "room2"
+      break;
+      case "28617C1E0300006F":
+        name = "crix1"
+      break;
+      case "28F8441E030000F2":
+        name = "crix2"
+      break;
+      case "285D5F1E03000049":
+        name = "crix3"
+      break;
+      default:
+        name = ""
+    }
     
     if (argv.debug == 1) {                   
       console.log("DEBUG :: Extracted :: Address: "+address+", Temperature: "+temp);
@@ -42,7 +65,7 @@ sp.on("data", function (data) {
       db.save(date_string()+ "@" + i, {
           time: new Date(),
           address: address, 
-          name: (''),
+          name: name,
           data: temp
       }, handleSave());
   
