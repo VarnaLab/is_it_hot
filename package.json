@@ -7,5 +7,6 @@
     , "date-utils": "latest"
     , "serialport": "latest"
     , "optimist": "latest"
+    , "forever": "latest"
   }
 }
