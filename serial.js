@@ -33,13 +33,20 @@ sp.on("data", function (data) {
   var splitted1 = data.split("A:")
 
   if(splitted1[1]!=undefined){
-    var splitted2 = splitted1[1].split(",T: "); 
+    if(splitted1[1].search(",T: ") != -1) {var splitted2 = splitted1[1].split(",T: "); } else {var splitted2 = splitted1[1].split(",H: "); }
+    //var splitted2 = splitted1[1].split(",T: "); 
     var splitted3 = splitted2[1].split("\r"); 
     var temp =  splitted3[0];          
     var address = splitted2[0];
     var name = "";
 
     switch(address){
+      case "room1_DHT_temp":
+        name = "room1_DHT_temp"
+      break;
+      case "room1_DHT_hum":
+        name = "room1_DHT_hum"
+      break;
       case "286C5A1E03000041":
         name = "air_in"
       break;
