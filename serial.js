@@ -3,6 +3,7 @@ var cradle = require('cradle');
 var date = require('date-utils');  
 var serialport = require("serialport");
 var argv = require('optimist').argv;
+var CONFIG = require('config').couch;
 
 var SerialPort = serialport.SerialPort;
 var sp = new SerialPort("/dev/tty"+argv.sp, { 
@@ -11,11 +12,11 @@ var sp = new SerialPort("/dev/tty"+argv.sp, {
   baudrate: 9600
 });
 
-var connection = new(cradle.Connection)('http://192.168.1.5', 5984, {
+var connection = new(cradle.Connection)(CONFIG.dbHost, CONFIG.dbPort, {
   cache: false,
   raw: false
 });
-var db = connection.database('sensors_dirty');
+var db = connection.database(CONFIG.dbName);
 
 var i = 0;  
 var date_string = function date_string(){ return Date.today().toYMD("_") +"@" + (new Date()).getHours() + ":"+(new Date()).getMinutes()+ ":" + (new Date()).getSeconds()+"." + (new Date()).getMilliseconds() };

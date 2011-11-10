@@ -1,0 +1,4 @@
+couch:
+  dbHost: http://192.168.1.5
+  dbPort: 5984
+  dbName: sensors_dirty

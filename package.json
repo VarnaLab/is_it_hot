@@ -8,5 +8,6 @@
     , "serialport": "latest"
     , "optimist": "latest"
     , "forever": "latest"
+    , "config": "latest"
   }
 }
