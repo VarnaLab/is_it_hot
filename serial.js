@@ -11,7 +11,7 @@ var sp = new SerialPort("/dev/tty"+argv.sp, {
   baudrate: 9600
 });
 
-var connection = new(cradle.Connection)('http://127.0.0.1', 5984, {
+var connection = new(cradle.Connection)('http://192.168.1.5', 5984, {
   cache: false,
   raw: false
 });
