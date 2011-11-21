@@ -21,6 +21,9 @@ var db = connection.database(CONFIG.dbName);
 var i = 0;  
 var date_string = function date_string(){ return Date.today().toYMD("_") +"@" + (new Date()).getHours() + ":"+(new Date()).getMinutes()+ ":" + (new Date()).getSeconds()+"." + (new Date()).getMilliseconds() };
 
+var sensors = [];
+var counter=0;
+
 sp.on("data", function (data) {
 
   var handleSave = function(err, r) {
@@ -29,25 +32,34 @@ sp.on("data", function (data) {
       if (err)  throw new Error(err);
     }
   }
-
+  
   console.log("  "+data);
-  var splitted1 = data.split("A:")
+  var begin_data = data.search("DATA");
+  
+  if (begin_data != -1) {
 
+   }
+   
+  var splitted1 = data.split("A:")
   if(splitted1[1]!=undefined){
     if(splitted1[1].search(",T: ") != -1) {var splitted2 = splitted1[1].split(",T: "); } else {var splitted2 = splitted1[1].split(",H: "); }
     //var splitted2 = splitted1[1].split(",T: "); 
     var splitted3 = splitted2[1].split("\r"); 
-    var temp =  splitted3[0];          
+    var sensor_data =  splitted3[0];  
+    console.log('sensor_data: '+sensor_data);        
     var address = splitted2[0];
     var name = "";
 
+
+
     switch(address){
       case "room1_DHT_temp":
-        name = "room1_DHT_temp"
+        name = "room1_DHT_temp"     
       break;
       case "room1_DHT_hum":
         name = "room1_DHT_hum"
       break;
+
       case "286C5A1E03000041":
         name = "air_in"
       break;
@@ -66,26 +78,48 @@ sp.on("data", function (data) {
       case "285D5F1E03000049":
         name = "crix3"
       break;
+
       default:
         name = ""
     }
     
-    if (argv.debug == 1) {                   
-      console.log("DEBUG :: Extracted :: Address: "+address+", Temperature: "+temp);
-      console.log("DEBUG :: Saving to CouchDB ... ");
-    }
-      db.save(date_string()+ "@" + i, {
-          time: new Date().getTime(),
-          address: address, 
-          name: name,
-          data: temp
-      }, handleSave());
-  
+    var sensor_obj = {data: sensor_data, address: address, name: name};
+    //sensor_obj.data = sensor_data;
+    sensors.push(sensor_obj);
+   
+
+    
   }
+  
 
   var enddata = data.search("ENDDATA");
   if (enddata != -1) {
-    if (argv.debug == 1) { console.log("DEBUG :: ENDDATA reached , incrementing ..."); } 
+    console.log('size'+sensors.length);
+    for(var i=0; i<sensors.length; i++) {
+      console.log(sensors[i].data);
+    }
+
+
+    db.save(date_string()+ "@" + i, {
+      time: new Date().getTime(),
+      sensors: sensors
+       
+    }, handleSave());
+  
+   if (argv.debug == 1) {
+     console.log("DEBUG :: Extracted :: Address: "+address+", Temperature: "+sensor_data);
+     console.log("DEBUG :: Saving to CouchDB ... ");
+     console.log("DEBUG :: ENDDATA reached , incrementing ...");
+   } 
+    console.log("DEBUG :: sensors_length before : "+sensors.length);
+    console.log("DEBUG :: DATA : counter : "+counter+"  Cleaning array...");
+    sensors.splice(sensors.length-counter,counter);
+    console.log("DEBUG :: sensors_length after: "+sensors.length);
+
+    
     i++;
+        counter = 0;
   }
+  
+  if(data.search("A:")!=-1){counter++}; 
 });
