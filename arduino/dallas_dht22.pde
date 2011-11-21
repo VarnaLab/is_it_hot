@@ -8,7 +8,7 @@
 #define DHTPIN 7 
 #define DHTTYPE DHT22 
 // Data wire is plugged into port 2 on the Arduino
-#define ONE_WIRE_BUS 8
+#define ONE_WIRE_BUS 9
 #define TEMPERATURE_PRECISION 9
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
@@ -18,7 +18,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 // arrays to hold device addresses
-DeviceAddress temp1, temp2 , temp3, temp4 , temp5, temp6;
+DeviceAddress temp1, temp2 , temp3, temp4 , temp5, temp6 , temp7;
 
 
 const int relay1_pin =  9;     
@@ -78,6 +78,7 @@ void setup(void)
   if (!sensors.getAddress(temp4, 3)) Serial.println("Unable to find address for Device 3"); 
   if (!sensors.getAddress(temp5, 4)) Serial.println("Unable to find address for Device 4"); 
   if (!sensors.getAddress(temp6, 5)) Serial.println("Unable to find address for Device 5"); 
+  if (!sensors.getAddress(temp7, 6)) Serial.println("Unable to find address for Device 6"); 
 
   // method 2: search()
   // search() looks for the next device. Returns 1 if a new address has been
@@ -118,6 +119,10 @@ void setup(void)
   printAddress(temp6);
   Serial.println();
   
+  Serial.print("Device 6 Address: ");
+  printAddress(temp7);
+  Serial.println();
+  
 
 
   // set the resolution to 9 bit
@@ -127,6 +132,7 @@ void setup(void)
   sensors.setResolution(temp4, 12);
   sensors.setResolution(temp5, 12);
   sensors.setResolution(temp6, 12);
+  sensors.setResolution(temp7, 12);
 
   Serial.print("Device 0 Resolution: ");
   Serial.print(sensors.getResolution(temp1), DEC); 
@@ -151,6 +157,11 @@ void setup(void)
   Serial.print("Device 5 Resolution: ");
   Serial.print(sensors.getResolution(temp6), DEC); 
   Serial.println();
+  
+  Serial.print("Device 6 Resolution: ");
+  Serial.print(sensors.getResolution(temp7), DEC); 
+  Serial.println();
+  
   Serial.print("INITEND");
 }
 
@@ -216,10 +227,6 @@ void loop(void)
   sensors.requestTemperatures();
   Serial.println();
   Serial.println("DATA");
-   
-   // print the device information
-  //Serial.println();
-  
 
   printData(temp1);
   printData(temp2);
@@ -227,9 +234,10 @@ void loop(void)
   printData(temp4);
   printData(temp5);
   printData(temp6);
+  printData(temp7);
   
   
-   float h = dht.readHumidity();
+  float h = dht.readHumidity();
   float t = dht.readTemperature();
 
   // check if returns are valid, if they are NaN (not a number) then something went wrong!
@@ -252,6 +260,7 @@ void loop(void)
   Serial.println("ENDDATA");  
   //printData(temp5);
   
+ 
   float temp1_reading = sensors.getTempC(temp1);
   Serial.print("Temp1 reading : ");  
   Serial.print(temp1_reading);
@@ -275,19 +284,6 @@ void loop(void)
 //status_led_state = HIGH;
 //digitalWrite(relay1_pin, relay1_state);
 //digitalWrite(status_led_pin,status_led_state);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   Serial.println("DELAY:");
   Serial.print(DELAY);
