@@ -45,45 +45,12 @@ sp.on("data", function (data) {
     if(splitted1[1].search(",T: ") != -1) {var splitted2 = splitted1[1].split(",T: "); } else {var splitted2 = splitted1[1].split(",H: "); }
     //var splitted2 = splitted1[1].split(",T: "); 
     var splitted3 = splitted2[1].split("\r"); 
-    var sensor_data =  splitted3[0];  
+    var sensor_data =  parseFloat(splitted3[0]);  
     console.log('sensor_data: '+sensor_data);        
     var address = splitted2[0];
-    var name = "";
 
-
-
-    switch(address){
-      case "room1_DHT_temp":
-        name = "room1_DHT_temp"     
-      break;
-      case "room1_DHT_hum":
-        name = "room1_DHT_hum"
-      break;
-
-      case "286C5A1E03000041":
-        name = "air_in"
-      break;
-      case "28257E1E03000045":
-        name = "room1"
-      break;
-      case "28B5501E030000AE":
-        name = "room2"
-      break;
-      case "28617C1E0300006F":
-        name = "crix1"
-      break;
-      case "28F8441E030000F2":
-        name = "crix2"
-      break;
-      case "285D5F1E03000049":
-        name = "crix3"
-      break;
-
-      default:
-        name = ""
-    }
     
-    var sensor_obj = {data: sensor_data, address: address, name: name};
+    var sensor_obj = {data: sensor_data, address: address};
     //sensor_obj.data = sensor_data;
     sensors.push(sensor_obj);
    
