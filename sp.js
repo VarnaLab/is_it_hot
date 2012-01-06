@@ -100,7 +100,9 @@
         console.log("DEBUG :: ENDDATA reached , incrementing ...");
         console.log("DEBUG :: sensors_length before : " + sensors.length);
         console.log("DEBUG :: DATA : counter : " + counter + "  Cleaning array...");
-        sensors.splice(sensors.length - counter, counter);
+      }
+      sensors.splice(sensors.length - counter, counter);
+      if (argv.debug) {
         console.log("DEBUG :: sensors_length after: " + sensors.length);
       }
       i++;
