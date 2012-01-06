@@ -46,7 +46,7 @@ sp.on "data", (data) ->
     if splitted1[1].search(",T: ") != -1
       splitted2 = splitted1[1].split ",T: "
     #humidity 
-    if splitted1[1].search(",H: ") != -1
+    else if splitted1[1].search(",H: ") != -1
       splitted2 = splitted1[1].split ",H: "
  
     splitted3 = splitted2[1].split "\r"
@@ -77,8 +77,9 @@ sp.on "data", (data) ->
  
       console.log "DEBUG :: sensors_length before : " + sensors.length
       console.log "DEBUG :: DATA : counter : " + counter + "  Cleaning array..."
-      sensors.splice(sensors.length-counter,counter)
-      console.log "DEBUG :: sensors_length after: " + sensors.length
+    
+    sensors.splice(sensors.length-counter,counter)
+    console.log "DEBUG :: sensors_length after: " + sensors.length if argv.debug
 
     i++
     counter = 0 

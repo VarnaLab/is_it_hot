@@ -62,8 +62,7 @@
     if (splitted1[1] !== void 0) {
       if (splitted1[1].search(",T: ") !== -1) {
         splitted2 = splitted1[1].split(",T: ");
-      }
-      if (splitted1[1].search(",H: ") !== -1) {
+      } else if (splitted1[1].search(",H: ") !== -1) {
         splitted2 = splitted1[1].split(",H: ");
       }
       splitted3 = splitted2[1].split("\r");
