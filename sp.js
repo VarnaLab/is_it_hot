@@ -11,7 +11,7 @@
 
   CONFIG = require('config').couch;
 
-  if (argv.debug === 1) console.log("DEBUG :: On");
+  if (argv.debug) console.log("DEBUG :: On");
 
   SerialPort = serialport.SerialPort;
 
@@ -28,6 +28,10 @@
   db = connection.database(CONFIG.dbName);
 
   i = 0;
+
+  sensors = [];
+
+  counter = 0;
 
   time_data = function(i) {
     var day, day_of_week, hour, millis, minutes, month, now, seconds, time_arr, time_str, timezone, today, year;
@@ -49,33 +53,17 @@
     };
   };
 
-  sensors = [];
-
-  counter = 0;
-
   sp.on("data", function(data) {
     var address, begin_data, enddata, handleSave, sensor, sensor_data, sensor_obj, splitted1, splitted2, splitted3, _i, _len;
-    handleSave = function(err, r) {
-      return function(err, r) {
-        if (argv.debug === 1) console.log("DEBUG :: Saved to DB");
-        if (err) throw new Error(err);
-      };
-    };
     console.log("  " + data);
     begin_data = data.search("DATA");
     enddata = data.search("ENDDATA");
-    if (enddata !== -1) {
-      console.log('size' + sensors.length);
-      for (_i = 0, _len = sensors.length; _i < _len; _i++) {
-        sensor = sensors[_i];
-        console.log(sensor.data);
-      }
-    }
     splitted1 = data.split("A:");
     if (splitted1[1] !== void 0) {
       if (splitted1[1].search(",T: ") !== -1) {
         splitted2 = splitted1[1].split(",T: ");
-      } else {
+      }
+      if (splitted1[1].search(",H: ") !== -1) {
         splitted2 = splitted1[1].split(",H: ");
       }
       splitted3 = splitted2[1].split("\r");
@@ -87,12 +75,27 @@
         address: address
       };
       sensors.push(sensor_obj);
-      db.save(time_data(i).time_str, {
-        time: new Date().getTime(),
-        time_arr: time_data(i).time_arr,
-        sensors: sensors
-      }, handleSave());
-      if (argv.debug === 1) {
+    }
+    if (enddata !== -1) {
+      console.log('size' + sensors.length);
+      for (_i = 0, _len = sensors.length; _i < _len; _i++) {
+        sensor = sensors[_i];
+        console.log(sensor.data);
+      }
+      handleSave = function(err, r) {
+        return function(err, r) {
+          if (argv.debug) console.log("DEBUG :: Saved to DB");
+          if (err) throw new Error(err);
+        };
+      };
+      if (db) {
+        db.save(time_data(i).time_str, {
+          time: new Date().getTime(),
+          time_arr: time_data(i).time_arr,
+          sensors: sensors
+        }, handleSave());
+      }
+      if (argv.debug) {
         console.log("DEBUG :: Extracted :: Address: " + address + ", Temperature: " + sensor_data);
         console.log("DEBUG :: Saving to CouchDB ... ");
         console.log("DEBUG :: ENDDATA reached , incrementing ...");
