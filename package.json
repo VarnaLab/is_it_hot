@@ -10,5 +10,7 @@
     , "optimist": "latest"
     , "forever": "latest"
     , "config": "latest"
+    , "cosm": "latest"
+    , "pachube-stream": "latest"
   }
 }

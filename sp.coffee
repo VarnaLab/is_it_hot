@@ -2,9 +2,11 @@
 serialport = require "serialport"
 argv = require('optimist').argv
 date = require 'date-utils'
+config = require 'config'
 time_helper = require(__dirname + '/helpers/time.coffee')
 serial = require(__dirname + '/helpers/serial.coffee')
 couchdb = require(__dirname + '/helpers/couchdb.coffee')
+cosm = require(__dirname + '/helpers/cosm.coffee')
 
 if argv.list
   serial.list
@@ -20,6 +22,7 @@ else
   i = 0
   counter = 0
   sensors = []
+  cosm_sensors = []
 
   serial_port.on "data", (data) ->
     console.log  data 
@@ -28,16 +31,33 @@ else
    
     unless data_tag is -1
       counter++
-      sensors.push serial.parse(data)
+      sensor_obj = serial.parse(data)
+
+      cosm_obj = {
+        "current_value" : sensor_obj.data,
+        "id" : sensor_obj.sn
+      }
+
+      cosm_sensors.push cosm_obj 
+      sensors.push sensor_obj
 
     unless data_end is -1
-      console.log "DEBUG :: Extracted :: " + JSON.stringify(sensors) if argv.debug 
+      cosm_data = { "datastreams" : cosm_sensors }
+      
+      if argv.debug
+        console.log "DEBUG :: Serial DATA :: " + JSON.stringify(sensors)
+        console.log "DEBUG :: Cosm DATA :: " + JSON.stringify(cosm)
 
       time_str = time_helper.time_data(i).time_str
       time_arr = time_helper.time_data(i).time_arr
       
+      #save to couchdb
       couchdb.save(time_str, time_arr, sensors)
+     
+      #send to cosm.com
+      cosm.put(cosm_data)
 
       counter = 0
       sensors = []
+      cosm_sensors = []
       i++ 
