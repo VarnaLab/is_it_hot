@@ -3,85 +3,45 @@ cradle = require 'cradle'
 date = require 'date-utils'
 serialport = require "serialport"
 argv = require('optimist').argv
-CONFIG = require('config').couch
+couchdb = require('config').couchdb
+time_data = require(__dirname + '/helpers/time.coffee').time_data
+serial_parser = require(__dirname + '/helpers/serial_parser.coffee')
+db_helper = require(__dirname + '/helpers/db_helper.coffee')
 
-if argv.debug
-  console.log "DEBUG :: On"
+console.log "DEBUG :: On" if argv.debug
 
 SerialPort = serialport.SerialPort
-sp = new SerialPort "/dev/tty" + argv.sp, { parser: serialport.parsers.readline("\n"), baudrate: 9600 }
+serial_port = new SerialPort "/dev/tty" + argv.sp, { 
+  parser: serialport.parsers.readline("\n"), 
+  baudrate: 9600 
+}
 
-connection = new(cradle.Connection)(CONFIG.dbHost, CONFIG.dbPort, { cache: false,raw: false })
-db = connection.database(CONFIG.dbName)
+connection = new(cradle.Connection)(couchdb.host, couchdb.port, { cache: false, raw: false })
+db = connection.database(couchdb.name)
 
 i = 0
-sensors = []
 counter = 0
 
-time_data = (i) ->
-  now = new Date()
-  today = now.toYMD("_")
-  year = now.getFullYear()
-  month = now.getMonth()
-  day = now.getDate()
-  hour = now.getHours()
-  minutes = now.getMinutes()
-  seconds = now.getSeconds()
-  millis = now.getMilliseconds()
-  day_of_week = now.getDay()
-  timezone = now.getTimezoneOffset()
-  time_str = today + "@" + hour + ":" + minutes + ":" + seconds + "." + millis + "@" + i
-
-  time_arr = { time_arr: [year, month, day, hour, minutes, seconds, day_of_week , timezone], time_str: time_str }
-  
-#read serial port
-sp.on "data", (data) ->
-  console.log "  " + data
-  begin_data = data.search "DATA"
-  enddata = data.search "ENDDATA"
-
-  splitted1 = data.split "A:"
-  if splitted1[1] != undefined
-    #temperature
-    if splitted1[1].search(",T: ") != -1
-      splitted2 = splitted1[1].split ",T: "
-    #humidity 
-    else if splitted1[1].search(",H: ") != -1
-      splitted2 = splitted1[1].split ",H: "
+serial_port.on "data", (data) ->
+  console.log  data 
+  data_tag = data.search "<"
+  data_end = data.search "ENDDATA"
  
-    splitted3 = splitted2[1].split "\r"
-    sensor_data =  parseFloat splitted3[0]
-    console.log 'sensor_data: ' + sensor_data      
-    address = splitted2[0]
+  unless data_tag is -1
+    serial_parser.parse data
 
-    sensor_obj = {data: sensor_data, address: address}
-    sensors.push sensor_obj
-  if enddata != -1
-    console.log 'size' + sensors.length
-    for sensor in sensors 
-      console.log sensor.data
-
-    handleSave = (err, r) ->
-      return (err, r) ->
-        if argv.debug
-          console.log "DEBUG :: Saved to DB"
-        if err 
-          throw new Error(err)
-
-    db.save(time_data(i).time_str, { time: new Date().getTime(),time_arr: time_data(i).time_arr,sensors: sensors}, handleSave()) if db
-  
-    if argv.debug 
-      console.log "DEBUG :: Extracted :: Address: " + address + ", Temperature: " + sensor_data
-      console.log "DEBUG :: Saving to CouchDB ... "
-      console.log "DEBUG :: ENDDATA reached , incrementing ..."
- 
-      console.log "DEBUG :: sensors_length before : " + sensors.length
-      console.log "DEBUG :: DATA : counter : " + counter + "  Cleaning array..."
+  unless data_end is -1
     
-    sensors.splice(sensors.length-counter,counter)
-    console.log "DEBUG :: sensors_length after: " + sensors.length if argv.debug
-
+    db.save(time_data(i).time_str, { 
+      time: new Date().getTime(),
+      time_arr: time_data(i).time_arr,
+      sensors: sensors
+    }, db_helper.output()) if db
+  
+    console.log "DEBUG :: Extracted :: " + JSON.stringify(sensors) if argv.debug 
+    
+    sensors = []
     i++
     counter = 0 
-  if data.search("A:") !=-1
+  unless data.search "<" is -1
     counter++

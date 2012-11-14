@@ -1,7 +1,7 @@
 module.exports = {
-    couch: {
-      dbName: "nautinuss_2012",
-      dbHost: "http://192.168.1.5",
-      dbPort: 5984
+    couchdb: {
+      name: "arduino_test",
+      host: "http://127.0.0.1",
+      port: 5984
     }
   }
