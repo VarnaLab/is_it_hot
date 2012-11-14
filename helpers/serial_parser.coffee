@@ -1,7 +1,5 @@
 module.exports.parse = parse = (data) ->
   # example_format : <sn:2807631E0300000D,data:20.94,type:temperature>
-  sensors = []
-
   sliced = data.slice(1,-2)
   splitted = sliced.split ","
 
@@ -14,4 +12,4 @@ module.exports.parse = parse = (data) ->
   sensor_data_type = sensor_data_type_arr[1]
 
   sensor_obj = {data: sensor_data, sn: sensor_sn}
-  sensors.push sensor_obj
+  
